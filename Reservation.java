@@ -4,33 +4,36 @@ public class Reservation {
     Scanner sc = new Scanner(System.in);
 
     private String guestName;
-    private Date inDate;
-    private Date outDate;
+    private int inDay;
+    private int outDay;
     private Room roomInfo;
     private double bookPrice;
     private double costBreak;
 
     //
 
-    public Reservation(String guestName) {
+    public Reservation(String guestName, int inDay, int outDay, Room roomInfo) {
         this.guestName = guestName;
-        
-        System.out.println("Enter Book-In Month:");
-        int inMonth = sc.nextInt();
-        System.out.println("Enter Book-In Date:");
-        int inDay = sc.nextInt();
-        System.out.println("Enter Book-In Year:");
-        int inYear = sc.nextInt();
+        this.inDay = inDay;
+        this.outDay = outDay;
+        this.roomInfo = roomInfo;
+    }
+    
+    public int getInDay() {
+        return inDay;
+    }
 
-        this.inDate = new Date(inMonth, inDay, inYear);
+    public int getOutDay() {
+        return outDay;
+    }
 
-        System.out.println("Enter Book-Out Month:");
-        int outMonth = sc.nextInt();
-        System.out.println("Enter Book-Out Date:");
-        int outDay = sc.nextInt();
-        System.out.println("Enter Book-Out Year:");
-        int outYear = sc.nextInt();
-
-        this.outDate = new Date(outMonth, outDay, outYear);
+    public boolean canBook(int inComp, int outComp) {
+        if ((inDay == inComp) || (outDay == outComp) //same day in or out
+        || ((inDay < inComp) && (outDay > inComp)) //new bookIn is within a reservation
+        || ((inDay < outComp) && (outDay > outComp)) //new bookOut is within a reservation
+        ) {
+            return false;
+        }
+        else return true;
     }
 }
