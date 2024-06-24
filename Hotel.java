@@ -14,12 +14,15 @@ public class Hotel {
     }
 
     public void createRoom() {
-        int size = roomList.size();
-
-        if(size < 50) {
-            Room room = new Room(size+1);
-            roomList.add(room);
-            System.out.println("Created Room Number " + size+1);
+        //int size = roomList.size();
+        //if(size < 50) {
+        //    Room room = new Room(size+1);
+        //    roomList.add(room);
+        //    System.out.println("Created Room Number " + (size+1));
+        //}
+        if(roomList.size() < 50){
+            roomList.add(new Room(roomList.size() + 1));
+            System.out.println("Created Room Number " + (roomList.size() + 1));
         }
     }
 
@@ -61,6 +64,10 @@ public class Hotel {
 
     public ArrayList<Room> getRoomList(){
         return roomList;
+    }
+
+    public double getEstMonthEarn() {
+        return estMonthEarn;
     }
 
 }

@@ -105,18 +105,18 @@ public class Room {
             reservationList.add(reserve);
         }
     }
-        
-    public int getRoomName() {
-        return roomName;
-    }
 
     public void setPrice(double newPrice) {
         this.pricePerNight = newPrice;
     }
 
-    //public double getCost() { // may or may not be in Hotel.java
-     //   return PerNight;
-    //}
+    public int getRoomName() {
+        return roomName;
+    }
+    
+    public double getCost() { // may or may not be in Hotel.java
+       return pricePerNight;
+    }
 
     public boolean getAvail() {
         return availRoom;

@@ -6,6 +6,8 @@ public class Main {
         Scanner scanOption = new Scanner(System.in);
         int option = scanOption.nextInt();
 
+        // may or may not be inside HotelSystem //may also not need main at all
+
         while (option != 5){
             System.out.println("Enter your choice: ");
             System.out.println("[1] Create a Hotel. ");
