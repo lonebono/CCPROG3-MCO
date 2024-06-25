@@ -1,47 +1,37 @@
-import java.util.Scanner;
+import java.util.Date;
 
 public class Reservation {
-    Scanner sc = new Scanner(System.in);
+    private final String guestName;
+    private final int checkIn;
+    private final int checkOut;
+    private final Room room;
+    private double totalPrice;
 
-    private String guestName;
-    private int inDay;
-    private int outDay;
-    private Room roomInfo;
-    private double bookPrice;
-    private double costBreak;
-
-    //
-
-    public Reservation(String guestName, int inDay, int outDay, Room roomInfo) {
+    public Reservation(String guestName, int checkIn, int checkOut, Room room) {
         this.guestName = guestName;
-        this.inDay = inDay;
-        this.outDay = outDay;
-        this.roomInfo = roomInfo;
-    }
-    
-    public int getInDay() {
-        return inDay;
-    }
-
-    public int getOutDay() {
-        return outDay;
-    }
-
-    public double getBookPrice() {
-        return bookPrice;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.room = room;
     }
 
     public String getGuestName() {
         return guestName;
     }
 
-    public boolean canBook(int inComp, int outComp) {
-        if ((inDay == inComp) || (outDay == outComp) //same day in or out
-        || ((inDay < inComp) && (outDay > inComp)) //new bookIn is within a reservation
-        || ((inDay < outComp) && (outDay > outComp)) //new bookOut is within a reservation
-        ) {
-            return false;
-        }
-        else return true;
+    public int getCheckIn() {
+        return checkIn;
+    }
+
+    public int getCheckOut() {
+        return checkOut;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    public double calculateTotalPrice() {
+        int totalDays = checkOut - checkIn;
+        return totalDays * room.getBasePricePerNight();
     }
 }
