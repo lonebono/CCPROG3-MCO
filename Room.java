@@ -113,7 +113,7 @@ public class Room {
     public int getRoomName() {
         return roomName;
     }
-    
+
     public double getCost() { // may or may not be in Hotel.java
        return pricePerNight;
     }
@@ -122,5 +122,7 @@ public class Room {
         return availRoom;
     }
 
-    
+    public ArrayList<Reservation> getReservationList() {
+        return reservationList;
+    }
 }

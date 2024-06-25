@@ -66,7 +66,7 @@ public class ReserveSystem {
                         dateChosen = sc.nextInt();
                         System.out.println("Enter Day (1-31): ");
                         for(int j = 0; j < hotelList.get(i).getRoomList().size(); j++){
-                            // not sure how to check
+                            hotelList.get(i).getRoomList().get(j).getReservationList(k)
                         }
                     }
                     else if (infoChoice == 2){

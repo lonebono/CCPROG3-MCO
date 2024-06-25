@@ -27,6 +27,14 @@ public class Reservation {
         return outDay;
     }
 
+    public double getBookPrice() {
+        return bookPrice;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
     public boolean canBook(int inComp, int outComp) {
         if ((inDay == inComp) || (outDay == outComp) //same day in or out
         || ((inDay < inComp) && (outDay > inComp)) //new bookIn is within a reservation
