@@ -1,247 +1,256 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
+/**
+ * Represents a hotel with rooms and reservations in a hotel reservation system.
+ */
 public class Hotel {
-    Scanner sc = new Scanner(System.in);
-
-
     private String hotelName;
-    private ArrayList<Room> roomList = new ArrayList<Room>();
-    private ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
-    private double estMonthEarn;
+    private ArrayList<Room> roomList = new ArrayList<>();
+    private ArrayList<Reservation> reservationList = new ArrayList<>();
+    private double basePrice = 1299.0; // Example base price
 
-
-    public Hotel(String hotelName){
+    /**
+     * Constructs a hotel with a specified name.
+     * Initializes with one room.
+     *
+     * @param hotelName The name of the hotel.
+     */
+    public Hotel(String hotelName) {
         this.hotelName = hotelName;
-	this.roomList = new ArrayList<>;
-	this.reservationList = new ArrayList<>;
-        createRoom(); //call create room since room minimum is 1
+        createRoom(); // call create room since room minimum is 1
     }
 
-
+    /**
+     * Creates a new room and adds it to the hotel's room list.
+     * Restricts the maximum number of rooms to 50.
+     */
     public void createRoom() {
-        if(roomList.size() < 50 && roomList.size() >= 0){
+        if (roomList.size() < 50) {
             roomList.add(new Room(roomList.size() + 1));
-            System.out.println("Created Room Number " + (roomList.size() + 1));
+            System.out.println("Created Room Number " + roomList.size());
         }
     }
 
-
-    public void removeRoom(){
-        // can remove if no reservation
-	int roomChoice;
-	System.out.println("Rooms that can be removed:");
-
-
-	for(int i = 0; i < roomList.size(); i++){
-if(roomList.get(i).reservationList.size() == 0){
-		System.out.println(i);
-	}
-    }
-//do {
-System.out.println(“Remove Room: “)
-roomChoice = sc.nextInt();
-
-
-if(roomChoice > roomList.size() || roomChoice < 0) {
-System.out.println(“Room ” + roomChoice + “ does not exist“);
-}else if(roomList.get(roomChoice - 1).reservationList.size() != 0) {
-System.out.println(“Room ” + roomChoice + “ cannot be removed“);
-}
-else System.out.println(“Confirm Removal of Room “ + roomChoice + “YES[1] NO[Any Other Number]”);
-int yesNo = sc.nextInt;
-
-
-if(yesNo == 1) {
-roomList.remove(roomChoice - 1);
-}
-}
-    public void setPrice(double price) {
-boolean success = true;
-for(int i = 0; i < roomList.size(); i++){
-if(roomList.get(i).reservationList.size() != 0){
-success = false
-}
-}
-if(success){
-do {
-        System.out.println("Input New price");
-        double newPrice = sc.nextDouble();
-
-
-        if(newPrice >= 100){
-            for(int i = 0; i < roomList.size(); i++){
-                roomList.get(i).setPrice(newPrice);
+    /**
+     * Removes a room from the hotel.
+     * Allows removal only if the room is not currently reserved.
+     */
+    public void removeRoom() {
+        System.out.println("Available rooms to remove:");
+        ArrayList<Integer> removableRooms = new ArrayList<>();
+        for (int i = 0; i < roomList.size(); i++) {
+            boolean removable = true;
+            for (Reservation res : reservationList) {
+                if (res.getRoomInfo().getRoomNumber() == i + 1) {
+                    removable = false;
+                    break;
+                }
             }
-	System.out.println("Price has been updated!");
+            if (removable) {
+                removableRooms.add(i + 1);
+                System.out.println("Room " + (i + 1));
+            }
         }
-        else{System.out.println("New price must be greater or equal to 100");
+
+        System.out.println("Remove Room: ");
+        Scanner sc = new Scanner(System.in);
+        int roomChoice = sc.nextInt();
+        sc.nextLine(); // Consume newline
+
+        if (!removableRooms.contains(roomChoice)) {
+            System.out.println("Room " + roomChoice + " cannot be removed or does not exist");
+            sc.close();
+            return;
         }
-} while(newPrice < 100);
+
+        System.out.println("Confirm Removal of Room " + roomChoice + " YES[1] NO[Any Other Number]");
+        int yesNo = sc.nextInt();
+        sc.nextLine(); // Consume newline
+
+        if (yesNo == 1) {
+            roomList.remove(roomChoice - 1);
+            System.out.println("Room has been removed");
+        }
+        sc.close();
     }
-    else System.out.println("An existing reservation exists. Cannot change price.");
-}
+
+    /**
+     * Updates the base price of the hotel.
+     * The new price must be at least $100 higher than the current base price.
+     *
+     * @param price The new base price to set.
+     */
+    public void setPrice(double price) {
+        boolean success = true;
+        for (Room room : roomList) {
+            for (Reservation res : reservationList) {
+                if (res.getRoomInfo().equals(room) && res.getOccDays().size() > 0) {
+                    success = false;
+                    break;
+                }
+            }
+            if (!success) break;
+        }
+
+        if (success) {
+            if (price < basePrice + 100.0) {
+                System.out.println("New price must be at least $100 higher than the current price.");
+                return;
+            }
+            basePrice = price;
+            System.out.println("Base price has been updated!");
+        } else {
+            System.out.println("An existing reservation exists. Cannot change base price.");
+        }
+    }
+
+    /**
+     * Retrieves the name of the hotel.
+     *
+     * @return The name of the hotel.
+     */
     public String getHotelName() {
         return hotelName;
     }
 
-
-    public ArrayList<Room> getRoomList(){
+    /**
+     * Retrieves the list of rooms in the hotel.
+     *
+     * @return The list of rooms.
+     */
+    public ArrayList<Room> getRoomList() {
         return roomList;
     }
 
-
-    public ArrayList<Reservation> getReservationList(){
-	return reservationList;
+    /**
+     * Retrieves the list of reservations in the hotel.
+     *
+     * @return The list of reservations.
+     */
+    public ArrayList<Reservation> getReservationList() {
+        return reservationList;
     }
 
-
-    public double getEstMonthEarn() {
-	double estimate = 0;
-		for(int j = 0; j < roomList().get(i).getReservationList().size(); j++){
-			estimate += reservationList().get(j).calculateBookPrice();
-}
-        	return estimate;
+    /**
+     * Cancels a reservation in the hotel.
+     *
+     * @param reservation The reservation to cancel.
+     */
+    public void cancelReserve(Reservation reservation) {
+        reservationList.remove(reservation);
+        reservation.getRoomInfo().changeAvail(reservation.getInDay(), reservation.getOutDay());
     }
 
-
-public void removeReserve() {
-System.out.println("Enter saved reservation’s Guest Name: ");
-String name = sc.nextLine();
-
-
-boolean exist = false;
-int reserveIndex;
-for(int i = 0; i < reservationList.size(); i++){
-if(reservationList.get(i).guestName.equalsIgnoreCaps(name)){
-exist = true;
-int reserveIndex = i;
-}
-
-
-if(exist) {
-System.out.println(“Confirm Removal of Reservation under “ + name + “YES[1] NO[Any Other Number]”);
-int yesNo = sc.nextInt;
-
-
-if(yesNo == 1) {
-reservationList.remove(reserveIndex);
-}
-}
-else System.out.println("Reservation does not exist");
-}
-
-
-public void bookReserve() {
-        System.out.println("Enter your name: ");
-        String guestName = sc.nextLine();
-
-
-        int inDay, outDay;
-        do {  
-            do {
-                System.out.println("Enter Book-In Day:");
-                inDay = sc.nextInt();
-
-
-                if(inDay >= 31 || inDay < 1) {
-                    System.out.println("Invalid day. Please enter a valid day (1-30)");
-                }
-            }  while (inDay >= 31 || inDay < 1); //Check-In cannot be in the 31st of the month and out of bounds
-
-
-
-
-            do {
-                System.out.println("Enter Book-Out Day:");
-                outDay = sc.nextInt();
-
-
-
-
-                if(outDay <= 1 || outDay > 31) {
-                    System.out.println("Invalid day. Please enter a valid day (2-31)");
-                }
-            } while (outDay <= 1 || outDay > 31); //Check-Out cannot be in the 1st of the month and out of bounds
-
-
-        if(inDay > outDay) {
-           System.out.println("Invalid Booking Dates. Check-out day cannot equal or exceed Check-in date");
+    /**
+     * Checks if a reservation can be booked for specified check-in and check-out dates.
+     *
+     * @param inDay  The check-in day.
+     * @param outDay The check-out day.
+     * @return True if a reservation can be booked, false otherwise.
+     */
+    public boolean canBookReservation(int inDay, int outDay) {
+        for (Room room : roomList) {
+            if (room.isAvailable(inDay, outDay)) {
+                return true;
+            }
         }
-
-
-        } while (inDay >= outDay);
-
-
-  ArrayList<int> occ = computeOcc(inDay, outDay);
-  boolean success = false;
-	if(countAvail(occ) > 0) {
-	success = true;
-	}
-
-
-        if(success) { //create reservation
-	Room roomAvail = bookRoom(occ);
-            Reservation reserve = new Reservation(guestName, inDay, outDay, roomAvail);
-            reservationList.add(reserve);
-        }
-        else System.out.println("There are no available rooms for that date. Please create another booking");
+        return false;
     }
 
+    /**
+     * Books a reservation in the hotel for specified check-in and check-out dates.
+     * Prompts for guest name and creates a new reservation.
+     *
+     * @param inDay  The check-in day.
+     * @param outDay The check-out day.
+     */
+    public void bookReserve(int inDay, int outDay) {
+        for (Room room : roomList) {
+            if (room.isAvailable(inDay, outDay)) {
+                System.out.println("Enter your name: ");
+                Scanner sc = new Scanner(System.in);
+                String guestName = sc.nextLine();
 
-public ArrayList<int> computeOcc(int in, int out) {
-ArrayList<int> occDays = new ArrayList<int>(); //days occupied
-     for(int i = in; i < out; i++) {
-        occDays.add(i); //add this. ??
-       }
-return occDays;
-}
+                Reservation reserve = new Reservation(guestName, inDay, outDay, room);
+                reservationList.add(reserve);
+                System.out.println("Reservation has been booked");
+                sc.close();
+                return;
+            }
+        }
+        System.out.println("There are no available rooms for that date. Please create another booking");
+    }
 
+    /**
+     * Retrieves the number of available rooms in the hotel on a specified day.
+     *
+     * @param day The day to check availability.
+     * @return The number of available rooms.
+     */
+    public int getAvailableRooms(int day) {
+        int availableRooms = 0;
+        for (Room room : roomList) {
+            if (room.getAvail().contains(day)) {
+                availableRooms++;
+            }
+        }
+        return availableRooms;
+    }
 
-public void countAvailBook(ArrayList<int> occ) {
-int cAvail = countAvail(occ);
-int cBook = countBook(occ);
+    /**
+     * Retrieves the number of booked rooms in the hotel on a specified day.
+     *
+     * @param day The day to check bookings.
+     * @return The number of booked rooms.
+     */
+    public int getBookedRooms(int day) {
+        return roomList.size() - getAvailableRooms(day);
+    }
 
+    /**
+     * Retrieves a room object by its room number.
+     *
+     * @param roomNumber The room number to retrieve.
+     * @return The Room object corresponding to the room number, or null if not found.
+     */
+    public Room getRoom(int roomNumber) {
+        if (roomNumber > 0 && roomNumber <= roomList.size()) {
+            return roomList.get(roomNumber - 1);
+        }
+        return null;
+    }
 
-System.out.println("There are “ + cAvail + “ Available room/s for the selected date”);
+    /**
+     * Retrieves a reservation object by guest name.
+     *
+     * @param guestName The name of the guest to retrieve reservation for.
+     * @return The Reservation object corresponding to the guest name, or null if not found.
+     */
+    public Reservation getReservationByGuestName(String guestName) {
+        for (Reservation reservation : reservationList) {
+            if (reservation.getGuestName().equalsIgnoreCase(guestName)) {
+                return reservation;
+            }
+        }
+        return null;
+    }
 
+    /**
+     * Calculates the total earnings from all reservations in the hotel.
+     *
+     * @return The total earnings.
+     */
+    public double calculateTotalEarnings() {
+        return reservationList.stream().mapToDouble(Reservation::getBookPrice).sum();
+    }
 
-System.out.println("There are “ + cBook + “ Booked room/s for the selected date”);
-}
-
-
-
-
-public int countAvail(ArrayList<int> occ) {
-int avail = 0;
-
-
-    for(int i = 0; i < roomList.size(); i++) {
-	if(roomList.get(i).roomCheck(occ)) {
-	avail++;
-	}
-     }
-return avail;
-}
-
-
-public int countBook(ArrayList<int> occ) {
-int book = 0;
-
-
-    for(int i = 0; i < roomList.size(); i++) {
-	if(!(roomList.get(i).roomCheck(occ))) {
-	book++;
-	}
-     }
-return book;
-}
-
-
-public Room bookRoom(ArrayList<int> occ) {
-for(int i = 0; i < roomList.size(); i++) {
-	if(roomList.get(i).roomCheck(occ)) {
-	return roomList.get(i);
-	}
+    /**
+     * Sets a new name for the hotel.
+     *
+     * @param newHotelName The new name to set for the hotel.
+     */
+    public void setHotelName(String newHotelName) {
+        this.hotelName = newHotelName;
+    }
 }
