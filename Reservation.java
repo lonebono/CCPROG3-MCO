@@ -1,24 +1,28 @@
-import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Reservation {
-    Scanner sc = new Scanner(System.in);
-
     private String guestName;
     private int inDay;
     private int outDay;
     private Room roomInfo;
     private double bookPrice;
-    private double costBreak;
-
-    //
+    private ArrayList<Integer> occDays;
 
     public Reservation(String guestName, int inDay, int outDay, Room roomInfo) {
         this.guestName = guestName;
         this.inDay = inDay;
         this.outDay = outDay;
         this.roomInfo = roomInfo;
+        this.bookPrice = calculateBookPrice();
+        this.occDays = new ArrayList<>();
+        
+        for (int i = inDay; i < outDay; i++) {
+            occDays.add(i);
+        }
+        
+        roomInfo.changeAvail(inDay, outDay); // Change room availability
     }
-    
+   
     public int getInDay() {
         return inDay;
     }
@@ -35,13 +39,12 @@ public class Reservation {
         return guestName;
     }
 
-    public boolean canBook(int inComp, int outComp) {
-        if ((inDay == inComp) || (outDay == outComp) //same day in or out
-        || ((inDay < inComp) && (outDay > inComp)) //new bookIn is within a reservation
-        || ((inDay < outComp) && (outDay > outComp)) //new bookOut is within a reservation
-        ) {
-            return false;
-        }
-        else return true;
+    public double calculateBookPrice() {
+        double totalDays = outDay - inDay;
+        return totalDays * roomInfo.getPricePerNight();
+    }
+
+    public ArrayList<Integer> getOccDays() {
+        return occDays;
     }
 }
