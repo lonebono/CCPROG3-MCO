@@ -1,3 +1,5 @@
+package MCO2.src;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -6,19 +8,24 @@ import java.util.Iterator;
  */
 public class Room {
     private int roomNumber;
-    private double pricePerNight = 1299.0; // Example price
-    private ArrayList<Integer> availability = new ArrayList<>();
+    protected double pricePerNight = 1299.0; // Base Price
+    private ArrayList<Integer> availability = new ArrayList<>(); // private works
+    private double[] priceRates = new double[31]; // array to hold price rates for each day
+    protected String roomType;
 
     /**
      * Constructs a room with a specified room number.
-     * Initializes availability for 30 days.
+     * Initializes availability for 31 days.
      *
      * @param roomNumber The room number.
+     * @param roomType The type of room.
      */
-    public Room(int roomNumber) {
+    public Room(int roomNumber, String roomType) {
         this.roomNumber = roomNumber;
-        for (int i = 1; i <= 30; i++) { // Changed to 30 to prevent check-in on day 31
-            availability.add(i);
+        this.roomType = roomType;
+        for (int i = 0; i < 31; i++) { 
+            availability.add(i+1);
+            priceRates[i] = 1.0; //initialise to 100% at room creation
         }
     }
 
@@ -31,6 +38,12 @@ public class Room {
         this.pricePerNight = newPrice;
     }
 
+    public void setPriceRate(int day, double rate) {
+        if (day >= 1 && day <= 31) {
+            priceRates[day-1] = rate;
+        }
+    }
+
     /**
      * Retrieves the room number.
      *
@@ -40,6 +53,14 @@ public class Room {
         return roomNumber;
     }
 
+    public String getRoomType() {
+        return roomType;
+    }
+    
+    public double getPriceRate(int day) {
+        return priceRates[day - 1];
+    }
+
     /**
      * Retrieves the price per night for the room.
      *
@@ -47,6 +68,16 @@ public class Room {
      */
     public double getPricePerNight() {
         return pricePerNight;
+    }
+
+    public double getTotalRate(int inDay, int outDay) {
+        double totalRate = 0.0;
+
+        for(int i = inDay - 1; i < outDay - 1; i++) {
+            totalRate += priceRates[i];
+        }
+        
+        return totalRate;
     }
 
     /**
@@ -66,7 +97,7 @@ public class Room {
      * @return True if the room is available for the specified period, false otherwise.
      */
     public boolean isAvailable(int inDay, int outDay) {
-        if (inDay == 31 || outDay == 1) {
+        if (inDay < 1 || outDay > 31) {
             return false;
         }
         for (int day = inDay; day < outDay; day++) {
@@ -98,7 +129,7 @@ public class Room {
      * @param in  The check-in day.
      * @param out The check-out day.
      */
-    public void changeAvail(int in, int out) {
+    public void removeAvail(int in, int out) {
         Iterator<Integer> iterator = availability.iterator();
         while (iterator.hasNext()) {
             int day = iterator.next();
@@ -106,5 +137,16 @@ public class Room {
                 iterator.remove();
             }
         }
+    }
+
+    public void addAvail(int in, int out) {
+        for(int i = 0; i < out - in; i++) {
+            availability.add(in - 1, in);
+            in++;
+        }
+    }
+
+    public String getRoomName() {
+        return "Room " + roomNumber + " - " + roomType;
     }
 }

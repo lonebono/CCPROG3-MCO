@@ -1,5 +1,6 @@
+
+package MCO2.src;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 /**
  * Represents a hotel with rooms and reservations in a hotel reservation system.
@@ -8,7 +9,8 @@ public class Hotel {
     private String hotelName;
     private ArrayList<Room> roomList = new ArrayList<>();
     private ArrayList<Reservation> reservationList = new ArrayList<>();
-    private double basePrice = 1299.0; // Example base price
+    private double basePrice = 1299.0; // starting base price
+
 
     /**
      * Constructs a hotel with a specified name.
@@ -18,61 +20,15 @@ public class Hotel {
      */
     public Hotel(String hotelName) {
         this.hotelName = hotelName;
-        createRoom(); // call create room since room minimum is 1
     }
 
     /**
-     * Creates a new room and adds it to the hotel's room list.
-     * Restricts the maximum number of rooms to 50.
+     * Sets a new name for the hotel.
+     *
+     * @param newHotelName The new name to set for the hotel.
      */
-    public void createRoom() {
-        if (roomList.size() < 50) {
-            roomList.add(new Room(roomList.size() + 1));
-            System.out.println("Created Room Number " + roomList.size());
-        }
-    }
-
-    /**
-     * Removes a room from the hotel.
-     * Allows removal only if the room is not currently reserved.
-     */
-    public void removeRoom() {
-        System.out.println("Available rooms to remove:");
-        ArrayList<Integer> removableRooms = new ArrayList<>();
-        for (int i = 0; i < roomList.size(); i++) {
-            boolean removable = true;
-            for (Reservation res : reservationList) {
-                if (res.getRoomInfo().getRoomNumber() == i + 1) {
-                    removable = false;
-                    break;
-                }
-            }
-            if (removable) {
-                removableRooms.add(i + 1);
-                System.out.println("Room " + (i + 1));
-            }
-        }
-
-        System.out.println("Remove Room: ");
-        Scanner sc = new Scanner(System.in);
-        int roomChoice = sc.nextInt();
-        sc.nextLine(); // Consume newline
-
-        if (!removableRooms.contains(roomChoice)) {
-            System.out.println("Room " + roomChoice + " cannot be removed or does not exist");
-            sc.close();
-            return;
-        }
-
-        System.out.println("Confirm Removal of Room " + roomChoice + " YES[1] NO[Any Other Number]");
-        int yesNo = sc.nextInt();
-        sc.nextLine(); // Consume newline
-
-        if (yesNo == 1) {
-            roomList.remove(roomChoice - 1);
-            System.out.println("Room has been removed");
-        }
-        sc.close();
+    public void setHotelName(String newHotelName) {
+        this.hotelName = newHotelName;
     }
 
     /**
@@ -99,10 +55,15 @@ public class Hotel {
                 return;
             }
             basePrice = price;
+            updateRoomPrices();
             System.out.println("Base price has been updated!");
         } else {
             System.out.println("An existing reservation exists. Cannot change base price.");
         }
+    }
+
+    public double getBasePrice() {
+        return basePrice;
     }
 
     /**
@@ -130,56 +91,6 @@ public class Hotel {
      */
     public ArrayList<Reservation> getReservationList() {
         return reservationList;
-    }
-
-    /**
-     * Cancels a reservation in the hotel.
-     *
-     * @param reservation The reservation to cancel.
-     */
-    public void cancelReserve(Reservation reservation) {
-        reservationList.remove(reservation);
-        reservation.getRoomInfo().changeAvail(reservation.getInDay(), reservation.getOutDay());
-    }
-
-    /**
-     * Checks if a reservation can be booked for specified check-in and check-out dates.
-     *
-     * @param inDay  The check-in day.
-     * @param outDay The check-out day.
-     * @return True if a reservation can be booked, false otherwise.
-     */
-    public boolean canBookReservation(int inDay, int outDay) {
-        for (Room room : roomList) {
-            if (room.isAvailable(inDay, outDay)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Books a reservation in the hotel for specified check-in and check-out dates.
-     * Prompts for guest name and creates a new reservation.
-     *
-     * @param inDay  The check-in day.
-     * @param outDay The check-out day.
-     */
-    public void bookReserve(int inDay, int outDay) {
-        for (Room room : roomList) {
-            if (room.isAvailable(inDay, outDay)) {
-                System.out.println("Enter your name: ");
-                Scanner sc = new Scanner(System.in);
-                String guestName = sc.nextLine();
-
-                Reservation reserve = new Reservation(guestName, inDay, outDay, room);
-                reservationList.add(reserve);
-                System.out.println("Reservation has been booked");
-                sc.close();
-                return;
-            }
-        }
-        System.out.println("There are no available rooms for that date. Please create another booking");
     }
 
     /**
@@ -237,6 +148,102 @@ public class Hotel {
     }
 
     /**
+     * Creates a new room and adds it to the hotel's room list.
+     * Restricts the maximum number of rooms to 50.
+     */
+    public void createRoom(String roomType) { 
+        if (roomList.size() < 50) {
+            if(roomType.equalsIgnoreCase("Standard")){
+                roomList.add(new Standard(roomList.size() + 1));
+            }
+            if(roomType.equalsIgnoreCase("Deluxe")){
+                roomList.add(new Deluxe(roomList.size() + 1));
+            }
+            if(roomType.equalsIgnoreCase("Executive")){
+                roomList.add(new Executive(roomList.size() + 1));
+            }
+        }
+    }
+
+    /**
+     * Removes a room from the hotel.
+     * Allows removal only if the room is not currently reserved.
+     */
+    public void removeRoom(int roomChoice) {
+        if (roomChoice > 0 && roomChoice <= roomList.size()) {
+            roomList.remove(roomChoice - 1);
+            System.out.println("Room has been removed");
+        } else {
+            System.out.println("Room " + roomChoice + " cannot be removed or does not exist");
+        }
+    }
+
+    private void updateRoomPrices(){
+        for(Room room : roomList){
+            room.setPrice(basePrice);
+        } // goes to every existing room and updates the base prices
+    }
+
+    /**
+     * Cancels a reservation in the hotel.
+     *
+     * @param reservation The reservation to cancel.
+     */
+    public void cancelReserve(Reservation reservation) {
+        reservationList.remove(reservation);
+        reservation.getRoomInfo().addAvail(reservation.getInDay(), reservation.getOutDay());
+    }
+
+    /**
+     * Checks if a reservation can be booked for specified check-in and check-out dates.
+     *
+     * @param inDay  The check-in day.
+     * @param outDay The check-out day.
+     * @return True if a reservation can be booked, false otherwise.
+     */
+    public boolean canBookReservation(int inDay, int outDay) {
+        for (Room room : roomList) {
+            if (room.isAvailable(inDay, outDay)) {
+                for (Reservation reservation : reservationList) {
+                    if (reservation.getRoomInfo() == room) {
+                        for (int day : reservation.getOccDays()) {
+                            if (day >= inDay && day <= outDay) { 
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Books a reservation in the hotel for specified check-in and check-out dates.
+     * Prompts for guest name and creates a new reservation.
+     *
+     * @param inDay  The check-in day.
+     * @param outDay The check-out day.
+     * @param guestName The guest name.
+     * @param roomChoice The room choice.
+     */
+    public void bookReserve(int inDay, int outDay, String guestName, int roomChoice, String discountCode) {
+        if (canBookReservation(inDay, outDay)) {
+            if (roomList.get(roomChoice-1).isAvailable(inDay, outDay)) {
+                Reservation reserve = new Reservation(guestName, inDay, outDay, roomList.get(roomChoice-1), discountCode);
+                reservationList.add(reserve);
+                System.out.println("Reservation has been booked");
+                return;
+            } else {
+                System.out.println("Room " + roomChoice + " is not available for the specified dates");
+            }
+        } else {
+            System.out.println("No rooms are available for the specified dates");
+        }
+    }
+
+    /**
      * Calculates the total earnings from all reservations in the hotel.
      *
      * @return The total earnings.
@@ -245,12 +252,30 @@ public class Hotel {
         return reservationList.stream().mapToDouble(Reservation::getBookPrice).sum();
     }
 
-    /**
-     * Sets a new name for the hotel.
-     *
-     * @param newHotelName The new name to set for the hotel.
-     */
-    public void setHotelName(String newHotelName) {
-        this.hotelName = newHotelName;
+    public void printAvailableDaysForPriceChange() {
+        System.out.println("Days available for price rate change:");
+        boolean foundAvailable = false;
+        for (int day = 1; day <= 31; day++) {
+            boolean canChange = true;
+            for (Room room : roomList) {
+                if (!room.isAvailable(day, day + 1)) {
+                    canChange = false;
+                    break;
+                }
+            }
+            if (canChange) {
+                System.out.print(day + " ");
+                foundAvailable = true;
+            }
+        }
+        if (!foundAvailable) {
+            System.out.println("No days available for price rate change.");
+        }
+        System.out.println("");
+    }
+    public void updatePriceRateForDay(int day, double rate) {
+        for (Room room : roomList) {
+            room.setPriceRate(day, rate);
+        }
     }
 }

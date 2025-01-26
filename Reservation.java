@@ -1,3 +1,5 @@
+package MCO2.src;
+
 import java.util.ArrayList;
 
 /**
@@ -8,8 +10,9 @@ public class Reservation {
     private int inDay;
     private int outDay;
     private Room roomInfo;
-    private double bookPrice;
-    private ArrayList<Integer> occDays;
+    private double bookPrice; // could be edited out
+    private ArrayList<Integer> occDays = new ArrayList<>();
+    private int discountNum = 0;
 
     /**
      * Constructs a new Reservation object.
@@ -18,13 +21,14 @@ public class Reservation {
      * @param inDay     The day of check-in.
      * @param outDay    The day of check-out.
      * @param roomInfo  The Room object representing the room reserved.
+     * @param discountCode The discount code entered by the guest.
      */
-    public Reservation(String guestName, int inDay, int outDay, Room roomInfo) {
+    public Reservation(String guestName, int inDay, int outDay, Room roomInfo, String discountCode) {
         this.guestName = guestName;
         this.inDay = inDay;
         this.outDay = outDay;
         this.roomInfo = roomInfo;
-        this.bookPrice = calculateBookPrice();
+        this.bookPrice = calculateBookPrice(discountCode);
         this.occDays = new ArrayList<>();
 
         // Mark all days from inDay to outDay (exclusive) as occupied
@@ -33,7 +37,16 @@ public class Reservation {
         }
 
         // Change room availability in the Room object
-        roomInfo.changeAvail(inDay, outDay);
+        roomInfo.removeAvail(inDay, outDay);
+    }
+
+    /**
+     * Retrieves the guest's name associated with the reservation.
+     *
+     * @return The guest's name.
+     */
+    public String getGuestName() {
+        return guestName;
     }
 
     /**
@@ -64,15 +77,6 @@ public class Reservation {
     }
 
     /**
-     * Retrieves the guest's name associated with the reservation.
-     *
-     * @return The guest's name.
-     */
-    public String getGuestName() {
-        return guestName;
-    }
-
-    /**
      * Retrieves the Room object associated with the reservation.
      *
      * @return The Room object.
@@ -81,15 +85,8 @@ public class Reservation {
         return roomInfo;
     }
 
-    /**
-     * Calculates and returns the total booking price based on the number of days
-     * stayed and the price per night of the room.
-     *
-     * @return The calculated booking price.
-     */
-    public double calculateBookPrice() {
-        double totalDays = outDay - inDay;
-        return totalDays * roomInfo.getPricePerNight();
+    public int getTotalDays() {
+        return outDay - inDay;
     }
 
     /**
@@ -100,5 +97,43 @@ public class Reservation {
      */
     public ArrayList<Integer> getOccDays() {
         return occDays;
+    }
+    
+    /**
+     * Calculates and returns the total booking price based on the number of days
+     * stayed and the price per night of the room.
+     *
+     * @return The calculated booking price.
+     */
+    public double calculateBookPrice(String discountCode) {
+        if(discountCode.equals("I_WORK_HERE")) {
+            discountNum = 1;
+        } else if(discountCode.equals("STAY4_GET1") && getTotalDays() >= 5) {
+            discountNum = 2;
+        } else if (discountCode.equals("PAYDAY") && isPayDay() && !(outDay == 15 || outDay == 30)) {
+            discountNum = 3;
+        } else {
+            discountNum = 0;
+        }
+        
+        switch(discountNum) {
+            case 1: return (roomInfo.getPricePerNight() * getTotalDays()) * 0.9;
+            case 2: return roomInfo.getPricePerNight() * (getTotalDays() - 1);
+            case 3: return (roomInfo.getPricePerNight() * getTotalDays()) * 0.93;
+            default: return roomInfo.getPricePerNight() * getTotalDays();
+        }
+    }
+
+    public boolean isPayDay() {
+        for (int i = inDay; i < outDay; i++) {
+            if(i == 15 || i == 30) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isMoreThan4() {
+        return getTotalDays() >= 5;
     }
 }
